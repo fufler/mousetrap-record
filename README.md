@@ -42,3 +42,15 @@ Mousetrap.record(function(sequence) {
     console.log('You pressed: ' + sequence.join(' '));
 }, 3000);
 ```
+
+You can also disable default browser behaviour while recording:
+
+```js
+// at initialize
+var Mousetrap = require('mousetrap-record')(require('mousetrap'), { timeout: 250, preventDefault: true });
+
+// or at record call
+Mousetrap.record(function(sequence) {
+    console.log('You pressed: ' + sequence.join(' '));
+}, 3000, true);
+```
