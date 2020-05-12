@@ -12,7 +12,8 @@ module.exports = function (Mousetrap, options) {
      * @type {Array}
      */
     var _config = Object.assign({
-        timeout: 1000
+        timeout: 1000,
+        preventDefault: false
     }, options);
 
     /**
@@ -64,7 +65,14 @@ module.exports = function (Mousetrap, options) {
          *
          * @type {number}
          */
-        _recordTimeout = _config.timeout;
+        _recordTimeout = _config.timeout,
+        
+        /**
+         * prevents firing browser events on recording key
+         * 
+         * @type {boolean}
+         */
+        _preventDefault = _config.preventDefault;
 
     /**
      * handles a character key event
@@ -80,6 +88,10 @@ module.exports = function (Mousetrap, options) {
         if (!self.recording) {
             _origHandleKey.apply(self, arguments);
             return;
+        }
+
+        if (_preventDefault) {
+            e.preventDefault();
         }
 
         // remember this character if we're currently recording a sequence
@@ -204,13 +216,15 @@ module.exports = function (Mousetrap, options) {
      * @param {Function} callback
      * @returns void
      */
-    Mousetrap.prototype.record = function(callback, timeout) {
+    Mousetrap.prototype.record = function(callback, timeout, preventDefault) {
         var self = this;
         self.recording = true;
 
         // if the user doesn't want to change the timeout
         // we still need to guarantee that it gets the default timeout
         _recordTimeout = timeout || _config.timeout;
+
+        _preventDefault = preventDefault || _config.preventDefault;
 
         _recordedSequenceCallback = function() {
             self.recording = false;
