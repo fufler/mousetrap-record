@@ -31,6 +31,12 @@ module.exports = function (Mousetrap, options) {
         _recordedSequenceCallback = null,
 
         /**
+         *  a callback to invoke to notify about recording progress
+         * @type {Function|null}
+         */
+         _recordProgressCallback = null,
+
+        /**
          * a list of all of the keys currently held down
          *
          * @type {Array}
@@ -133,6 +139,12 @@ module.exports = function (Mousetrap, options) {
         if (key.length === 1) {
             _recordedCharacterKey = true;
         }
+
+        if (_recordProgressCallback != null) {
+            var seq = _recordedSequence.concat([_currentRecordedKeys])
+            _normalizeSequence(seq)
+            _recordProgressCallback(seq)
+        }
     }
 
     /**
@@ -216,13 +228,14 @@ module.exports = function (Mousetrap, options) {
      * @param {Function} callback
      * @returns void
      */
-    Mousetrap.prototype.record = function(callback, timeout, preventDefault) {
+    Mousetrap.prototype.record = function(callback, timeout, preventDefault, progressCallback) {
         var self = this;
         self.recording = true;
 
         // if the user doesn't want to change the timeout
         // we still need to guarantee that it gets the default timeout
         _recordTimeout = timeout || _config.timeout;
+        _recordProgressCallback = progressCallback
 
         _preventDefault = preventDefault || _config.preventDefault;
 
