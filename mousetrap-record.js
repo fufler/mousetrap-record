@@ -13,7 +13,8 @@ module.exports = function (Mousetrap, options) {
      */
     var _config = Object.assign({
         timeout: 1000,
-        preventDefault: false
+        preventDefault: false,
+        noRepeat: false
     }, options);
 
     /**
@@ -78,7 +79,14 @@ module.exports = function (Mousetrap, options) {
          * 
          * @type {boolean}
          */
-        _preventDefault = _config.preventDefault;
+        _preventDefault = _config.preventDefault,
+
+        /**
+         * disables capturing of repeated evets
+         *
+         * @type {boolean}
+         */
+        _noRepeat = _config.noRepeat;
 
     /**
      * handles a character key event
@@ -89,6 +97,10 @@ module.exports = function (Mousetrap, options) {
      * @returns void
      */
     function _handleKey(character, modifiers, e) {
+        if (_noRepeat && e.repeat) {
+            return
+        }
+
         var self = this;
 
         if (!self.recording) {
@@ -228,7 +240,7 @@ module.exports = function (Mousetrap, options) {
      * @param {Function} callback
      * @returns void
      */
-    Mousetrap.prototype.record = function(callback, timeout, preventDefault, progressCallback) {
+    Mousetrap.prototype.record = function(callback, timeout, preventDefault, noRepeat, progressCallback) {
         var self = this;
         self.recording = true;
 
@@ -238,6 +250,7 @@ module.exports = function (Mousetrap, options) {
         _recordProgressCallback = progressCallback
 
         _preventDefault = preventDefault || _config.preventDefault;
+        _noRepeat = noRepeat || _config.noRepeat
 
         _recordedSequenceCallback = function() {
             self.recording = false;
